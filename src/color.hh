@@ -1,9 +1,9 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include "commons.hh"
 #include "vec3.hh"
 
-#include <iostream>
 
 using Color = Vec3;
 
