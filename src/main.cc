@@ -1,22 +1,13 @@
-#include "color.hh"
-#include "ray.hh"
-#include "vec3.hh"
+#include "commons.hh"
+#include "hittable.hh"
+#include "hittable_list.hh"
+#include "sphere.hh"
 
-#include <iostream>
 
-bool hit_sphere(const Point3& center, double radius, const Ray& r) {
-    Vec3 oc = center - r.origin();
-    //quad form
-    auto a = dot(r.direction(), r.direction());
-    auto b = -2.0 * dot(r.direction(), oc);
-    auto c = dot(oc, oc) - radius*radius;
-    auto discriminant = b*b - 4*a*c;
-    return (discriminant >= 0);
-}
-
-Color ray_color(const Ray& r) {
-    if(hit_sphere(Point3(0,0,-1), 0.5, r)){
-        return Color(1, 0, 0);
+Color ray_color(const Ray& r, const Hittable& world) {
+    Hit_Record rec;
+    if (world.hit(r, Interval(0, infinity), rec)) {
+        return 0.5 * (rec.normal + Color(1,1,1));
     }
     // blendedVal = (1 - a) * start + a * end
     Vec3 unit_direction = unit_vector(r.direction());
@@ -34,6 +25,12 @@ int main() {
     //find image height - make sure >= 1
     int image_height = int(image_width / aspect_ratio);
     image_height = (image_height < 1) ? 1 : image_height;
+
+    //World
+    Hittable_List world;
+
+    world.add(make_shared<Sphere>(Point3(0,0,-1), 0.5));
+    world.add(make_shared<Sphere>(Point3(0,-100.5,-1), 100));
 
     //Camera
     auto focal_length = 1.0;
@@ -66,8 +63,7 @@ int main() {
             auto ray_direction = pixel_center - camera_center;
             Ray r(camera_center, ray_direction);
 
-            Color pixel_color = ray_color(r);
-            // auto pixel_color = Color(double(j) / (image_width-1), double(i) / (image_height-1) , 0.45);
+            Color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }

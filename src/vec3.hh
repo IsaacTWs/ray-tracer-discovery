@@ -1,8 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include <cmath>
-#include <iostream>
+#include "commons.hh"
 
 //can revist for double vs float usage for memory usage
 class Vec3 {
