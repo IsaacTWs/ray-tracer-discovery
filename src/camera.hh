@@ -5,9 +5,10 @@
 
 class Camera {
     public: 
-        double aspect_ratio;
-        int image_width;
-        int samples_per_pixel;
+        double aspect_ratio = 1.0;
+        int image_width = 100;
+        int samples_per_pixel = 10;
+        int max_depth = 10;
 
         void render(const Hittable& world) {
             initialize();
@@ -21,7 +22,7 @@ class Camera {
                     Color pixel_color(0,0,0);
                     for(int sample = 0; sample < samples_per_pixel; sample++) {
                         Ray r = get_ray(j, i);
-                        pixel_color += ray_color(r, world);
+                        pixel_color += ray_color(r, max_depth, world);
                     }
                     write_color(std::cout, pixel_samples_scale * pixel_color);
                 }
@@ -82,10 +83,15 @@ class Camera {
             return Vec3(random_double() - 0.5, random_double() - 0.5, 0);
         }
 
-        Color ray_color(const Ray& r, const Hittable& world) const {
+        Color ray_color(const Ray& r, int depth, const Hittable& world) const {
+            if (depth <= 0) {
+                return Color(0,0,0);
+            }
             Hit_Record rec;
-            if (world.hit(r, Interval(0, infinity), rec)) {
-                return 0.5 * (rec.normal + Color(1,1,1));
+            if (world.hit(r, Interval(0.001, infinity), rec)) {
+                //lambertian distr.
+                Vec3 direction = rec.normal + random_unit_vector(); // scatter evenly -> random_on_hemisphere(rec.normal) 
+                return 0.1 * ray_color(Ray(rec.p, direction),depth - 1, world);
             }
             // blendedVal = (1 - a) * start + a * end
             Vec3 unit_direction = unit_vector(r.direction());
