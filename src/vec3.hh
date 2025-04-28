@@ -52,6 +52,11 @@ class Vec3 {
         double length() const {
             return std::sqrt(length_squared());
         }
+
+        bool near_zero() const {
+            auto s = 1e-8;
+            return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
+        }
 };
 
 //alias
@@ -116,6 +121,10 @@ inline Vec3 random_on_hemisphere(const Vec3& normal) {
         return on_unit_sphere;
     } 
     return -on_unit_sphere;
+}
+
+inline Vec3 reflect(const Vec3& v, const Vec3& n) {
+    return v - 2*dot(v,n)*n;
 }
 
 #endif
