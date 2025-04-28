@@ -3,12 +3,15 @@
 
 #include "commons.hh"
 
+class Material;
+
 class Hit_Record {
     public:
         Point3 p;
         Vec3 normal;
         double t;
         bool front_face;
+        shared_ptr<Material> mat;
 
         void set_face_normal(const Ray& r, const Vec3& outward_normal) {
             //sets hit record normal vector - assumes arg[1] to have unit length
